@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useState } from "react";
 import styled from "styled-components";
 import SearchAble from "./components/SearchAble";
 import { useOptions } from "./hook/useOptions";
@@ -24,20 +24,24 @@ type SelectProps = {
  */
 function Select(props: SelectProps): ReactNode {
   // selectbox open state
+  const [search, setSearch] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { options } = useOptions(props.options);
-
-  useEffect(() => {
-    console.log(options);
-  }, [options]);
+  const { filterdOptions } = useOptions(props.options, search);
 
   return (
     <SelectWrapper>
       <SearchAble
+        search={search}
         handleSelectView={(state) => setIsOpen(state)}
-        handleSearchChange={(e) => e}
+        handleSearchChange={setSearch}
       />
-      {isOpen && <ListWrapper>{}</ListWrapper>}
+      {isOpen && (
+        <ListWrapper>
+          {filterdOptions?.map((item) => {
+            return <List key={item.value}>{item.label}</List>;
+          })}
+        </ListWrapper>
+      )}
     </SelectWrapper>
   );
 }
@@ -46,5 +50,27 @@ export { Select };
 
 const SelectWrapper = styled.div`
   width: 300px;
+  position: relative;
 `;
-const ListWrapper = styled.ul``;
+const ListWrapper = styled.ul`
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  max-height: 300px;
+  position: absolute;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  overflow: auto;
+  background-color: white;
+  z-index: 1;
+  width: 100%;
+`;
+
+const List = styled.li`
+  padding: 8px 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ededed;
+  }
+`;

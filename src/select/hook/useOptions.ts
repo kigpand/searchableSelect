@@ -1,8 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Options } from "../Select";
 
-export function useOptions(optionValue: Options | (() => Promise<Options>)) {
+export function useOptions(
+  optionValue: Options | (() => Promise<Options>),
+  search: string
+) {
   const [options, setOptions] = useState<Options>([]);
+  const filterdOptions = useMemo(() => {
+    if (search === "") return options;
+    return options.filter((item) =>
+      item.label.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [options, search]);
 
   useEffect(() => {
     if (typeof optionValue === "object") {
@@ -18,5 +27,5 @@ export function useOptions(optionValue: Options | (() => Promise<Options>)) {
     setOptions(value);
   };
 
-  return { options };
+  return { options, filterdOptions };
 }

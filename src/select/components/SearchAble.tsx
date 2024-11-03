@@ -1,7 +1,8 @@
-import { HTMLAttributes, useEffect, useState } from "react";
+import { HTMLAttributes } from "react";
 import styled from "styled-components";
 
 type Props = {
+  search: string;
   // selectbox view state controll
   handleSelectView: (state: boolean) => void;
   // search value controll
@@ -9,22 +10,17 @@ type Props = {
 } & HTMLAttributes<HTMLInputElement>;
 
 export default function SearchAble({
+  search,
   handleSearchChange,
   handleSelectView,
   ...props
 }: Props) {
-  const [search, setSearch] = useState<string>("");
-
-  useEffect(() => {
-    handleSearchChange(search);
-  }, [search]);
-
   return (
     <SearchWrapper
       value={search}
       onFocus={() => handleSelectView(true)}
       onBlur={() => handleSelectView(false)}
-      onChange={(e) => setSearch(e.target.value)}
+      onChange={(e) => handleSearchChange(e.target.value)}
       {...props}
     />
   );
@@ -32,6 +28,7 @@ export default function SearchAble({
 
 const SearchWrapper = styled.input`
   width: 100%;
+  box-sizing: border-box;
   padding: 16px 8px;
   border: 1px solid lightgray;
   background-color: white;

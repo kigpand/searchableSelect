@@ -8,7 +8,6 @@ function DemoPage() {
   const [selectedValue, setSelectedValue] = useState<string>();
   return (
     <DemoPageStyled>
-      <div>demo</div>
       <Select
         value={selectedValue}
         options={top100Films}
