@@ -5,7 +5,7 @@ import top100Films from "./top100Films.json";
 import styled from "styled-components";
 
 function DemoPage() {
-  const [selectedValue, setSelectedValue] = useState<string>();
+  const [selectedValue, setSelectedValue] = useState<string>("");
   return (
     <DemoPageStyled>
       <Select
@@ -13,11 +13,11 @@ function DemoPage() {
         options={top100Films}
         onChange={(value) => setSelectedValue(value)}
       />
-      <Select
+      {/* <Select
         value={selectedValue}
         options={fetchTop100Films}
         onChange={(value) => setSelectedValue(value)}
-      />
+      /> */}
     </DemoPageStyled>
   );
 }

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import styled from "styled-components";
 import SearchAble from "./components/SearchAble";
 import { useOptions } from "./hook/useOptions";
@@ -28,6 +28,16 @@ function Select(props: SelectProps): ReactNode {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { filterdOptions } = useOptions(props.options, search);
 
+  useEffect(() => {
+    if (props.value) {
+      setSearch(props.value);
+    }
+  }, [props.value]);
+
+  const handleListClick = (item: string) => {
+    if (props.onChange) props.onChange(item);
+  };
+
   return (
     <SelectWrapper>
       <SearchAble
@@ -38,7 +48,14 @@ function Select(props: SelectProps): ReactNode {
       {isOpen && (
         <ListWrapper>
           {filterdOptions?.map((item) => {
-            return <List key={item.value}>{item.label}</List>;
+            return (
+              <List
+                key={item.value}
+                onMouseDown={() => handleListClick(item.label)}
+              >
+                {item.label}
+              </List>
+            );
           })}
         </ListWrapper>
       )}
