@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import styled from "styled-components";
 import SearchAble from "./components/SearchAble";
 import { useOptions } from "./hook/useOptions";
@@ -27,6 +27,7 @@ function Select(props: SelectProps): ReactNode {
   const [search, setSearch] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { filterdOptions } = useOptions(props.options, search);
+  const [focus, setFocus] = useState<number>(0);
 
   useEffect(() => {
     if (props.value) {
@@ -38,8 +39,32 @@ function Select(props: SelectProps): ReactNode {
     if (props.onChange) props.onChange(item);
   };
 
+  const handleArrowDown = (index: number | null) => {
+    if (index === null || index === filterdOptions.length - 1) return 0;
+    return index + 1;
+  };
+
+  const handleArrowUp = (index: number | null) => {
+    if (index === null || index === 0) return filterdOptions.length - 1;
+    return index - 1;
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    switch (e.key) {
+      case "ArrowDown":
+        setFocus((focus) => handleArrowDown(focus));
+        return;
+      case "ArrowUp":
+        setFocus((focus) => handleArrowUp(focus));
+        return;
+      case "Enter":
+        setIsOpen(false);
+        return;
+    }
+  };
+
   return (
-    <SelectWrapper>
+    <SelectWrapper onKeyDown={(e) => handleKeyPress(e)}>
       <SearchAble
         search={search}
         handleSelectView={(state) => setIsOpen(state)}
@@ -47,11 +72,14 @@ function Select(props: SelectProps): ReactNode {
       />
       {isOpen && (
         <ListWrapper>
-          {filterdOptions?.map((item) => {
+          {filterdOptions?.map((item, i) => {
             return (
               <List
+                $isFocus={focus === i}
                 key={item.value}
+                tabIndex={i}
                 onMouseDown={() => handleListClick(item.label)}
+                onMouseOver={() => setFocus(i)}
               >
                 {item.label}
               </List>
@@ -83,11 +111,8 @@ const ListWrapper = styled.ul`
   width: 100%;
 `;
 
-const List = styled.li`
+const List = styled.li<{ $isFocus: boolean }>`
   padding: 8px 4px;
   cursor: pointer;
-
-  &:hover {
-    background-color: #ededed;
-  }
+  background-color: ${(props) => (props.$isFocus ? "#ededed" : "transparent")};
 `;
