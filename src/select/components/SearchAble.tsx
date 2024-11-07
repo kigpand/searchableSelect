@@ -2,6 +2,7 @@ import { HTMLAttributes } from "react";
 import styled from "styled-components";
 
 type Props = {
+  // search value
   search: string;
   // selectbox view state controll
   handleSelectView: (state: boolean) => void;

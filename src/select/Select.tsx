@@ -23,14 +23,19 @@ type SelectProps = {
  * - `Select`가 hover 되는 경우와 focus 되는 경우, 그리고 두 경우가 아닌 경우에 대해 `Select`의 스타일이 달라야 합니다.
  */
 function Select(props: SelectProps): ReactNode {
-  // selectbox open state
+  // selectbox search state
   const [search, setSearch] = useState<string>("");
+  // selectbox open state
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  // option control hook
   const { filterdOptions, handleOptionDown, handleOptionUp } = useOptions(
     props.options,
     search
   );
+  // current option index
   const [focus, setFocus] = useState<number>(0);
+
+  // list wrapper ref
   const ref = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
