@@ -27,5 +27,17 @@ export function useOptions(
     setOptions(value);
   };
 
-  return { options, filterdOptions };
+  const handleOptionDown = (index: number | null) => {
+    if (index === null || index === filterdOptions.length - 1) {
+      return filterdOptions.length - 1;
+    }
+    return index + 1;
+  };
+
+  const handleOptionUp = (index: number | null) => {
+    if (index === null || index === 0) return 0;
+    return index - 1;
+  };
+
+  return { options, filterdOptions, handleOptionDown, handleOptionUp };
 }

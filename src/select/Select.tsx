@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import SearchAble from "./components/SearchAble";
 import { useOptions } from "./hook/useOptions";
@@ -26,8 +26,12 @@ function Select(props: SelectProps): ReactNode {
   // selectbox open state
   const [search, setSearch] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { filterdOptions } = useOptions(props.options, search);
+  const { filterdOptions, handleOptionDown, handleOptionUp } = useOptions(
+    props.options,
+    search
+  );
   const [focus, setFocus] = useState<number>(0);
+  const ref = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (props.value) {
@@ -39,39 +43,46 @@ function Select(props: SelectProps): ReactNode {
     if (props.onChange) props.onChange(item);
   };
 
-  const handleArrowDown = (index: number | null) => {
-    if (index === null || index === filterdOptions.length - 1) return 0;
-    return index + 1;
-  };
-
-  const handleArrowUp = (index: number | null) => {
-    if (index === null || index === 0) return filterdOptions.length - 1;
-    return index - 1;
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter" && !isOpen) setIsOpen(true);
     switch (e.key) {
       case "ArrowDown":
-        setFocus((focus) => handleArrowDown(focus));
+        setFocus((focus) => handleOptionDown(focus));
         return;
       case "ArrowUp":
-        setFocus((focus) => handleArrowUp(focus));
+        setFocus((focus) => handleOptionUp(focus));
         return;
       case "Enter":
+        if (focus >= filterdOptions.length) return;
         setIsOpen(false);
+        setSearch(filterdOptions[focus].label);
         return;
     }
   };
+
+  const handleChangeSearch = (search: string) => {
+    setFocus(0);
+    setSearch(search);
+  };
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.children[focus].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [ref, focus]);
 
   return (
     <SelectWrapper onKeyDown={(e) => handleKeyPress(e)}>
       <SearchAble
         search={search}
         handleSelectView={(state) => setIsOpen(state)}
-        handleSearchChange={setSearch}
+        handleSearchChange={handleChangeSearch}
       />
       {isOpen && (
-        <ListWrapper>
+        <ListWrapper ref={ref}>
           {filterdOptions?.map((item, i) => {
             return (
               <List
@@ -115,4 +126,7 @@ const List = styled.li<{ $isFocus: boolean }>`
   padding: 8px 4px;
   cursor: pointer;
   background-color: ${(props) => (props.$isFocus ? "#ededed" : "transparent")};
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `;
